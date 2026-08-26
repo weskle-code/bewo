@@ -1,0 +1,7 @@
+Thumbs.db
+.DS_Store
+*.log
+
+# Arquivos locais não usados na LP
+/WhatsApp*
+/0000_img-espuma-1*
