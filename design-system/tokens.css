@@ -59,9 +59,10 @@
   --font-h4-size: clamp(1.76rem, calc(0.8577vw + 1.102144rem), 2.2rem);
 
   /* Layout */
-  --page-width: 1410px;
+  --page-width: 1440px;
   --bewo-bento-inset: 2rem;
   --bewo-bento-radius: 1.6rem;
+  --bewo-square-size: clamp(18rem, 32vw, 36rem);
 
   /* Radius scale */
   --bewo-radius-sm: 1.2rem;

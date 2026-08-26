@@ -5,6 +5,7 @@
   /* ——— UI: cart / carousel ——— */
   const cartEls = $$("[data-cart-count]");
   const toast = $("[data-toast]");
+  let cartCount = 0;
   let toastTimer;
 
   const syncCart = () => cartEls.forEach((el) => (el.textContent = String(cartCount)));
@@ -54,29 +55,100 @@
     });
   });
 
-  const track = $("[data-carousel-track]");
-  const prev = $("[data-carousel-prev]");
-  const next = $("[data-carousel-next]");
-
-  const scrollByCard = (dir) => {
+  const initInfiniteCarousel = () => {
+    const track = $("[data-carousel-track]");
+    const prev = $("[data-carousel-prev]");
+    const next = $("[data-carousel-next]");
     if (!track) return;
-    const card = track.querySelector(".shot-card");
-    const amount = (card?.getBoundingClientRect().width || 260) + 16;
-    track.scrollBy({ left: dir * amount, behavior: "smooth" });
+
+    const originals = $$(".shot-card", track);
+    if (originals.length < 2) return;
+
+    const cloneSlide = (item, position) => {
+      const clone = item.cloneNode(true);
+      clone.classList.add("shot-card--clone");
+      clone.setAttribute("aria-hidden", "true");
+      clone.querySelector("img")?.setAttribute("alt", "");
+      if (position === "prepend") track.insertBefore(clone, track.firstChild);
+      else track.appendChild(clone);
+    };
+
+    [...originals].reverse().forEach((item) => cloneSlide(item, "prepend"));
+    originals.forEach((item) => cloneSlide(item, "append"));
+
+    const getGap = () =>
+      parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 0;
+
+    const getStep = () => originals[0].getBoundingClientRect().width + getGap();
+
+    const getSetWidth = () => getStep() * originals.length;
+
+    let isJumping = false;
+
+    const normalizeScroll = () => {
+      if (isJumping) return;
+      const setWidth = getSetWidth();
+
+      if (track.scrollLeft >= setWidth * 2 - 1) {
+        isJumping = true;
+        track.style.scrollBehavior = "auto";
+        track.scrollLeft -= setWidth;
+        track.style.scrollBehavior = "";
+        requestAnimationFrame(() => {
+          isJumping = false;
+        });
+      } else if (track.scrollLeft <= 1) {
+        isJumping = true;
+        track.style.scrollBehavior = "auto";
+        track.scrollLeft += setWidth;
+        track.style.scrollBehavior = "";
+        requestAnimationFrame(() => {
+          isJumping = false;
+        });
+      }
+    };
+
+    track.style.scrollBehavior = "auto";
+    track.scrollLeft = getSetWidth();
+    track.style.scrollBehavior = "";
+
+    window.addEventListener(
+      "load",
+      () => {
+        track.style.scrollBehavior = "auto";
+        track.scrollLeft = getSetWidth();
+        track.style.scrollBehavior = "";
+      },
+      { once: true }
+    );
+
+    track.addEventListener("scroll", normalizeScroll, { passive: true });
+    track.addEventListener("scrollend", normalizeScroll);
+
+    const scrollByCard = (dir) => {
+      track.scrollBy({ left: dir * getStep(), behavior: "smooth" });
+    };
+
+    prev?.addEventListener("click", () => scrollByCard(-1));
+    next?.addEventListener("click", () => scrollByCard(1));
   };
 
-  prev?.addEventListener("click", () => scrollByCard(-1));
-  next?.addEventListener("click", () => scrollByCard(1));
+  initInfiniteCarousel();
 
-  /* ——— GSAP ——— */
-  if (!window.gsap || !window.ScrollTrigger) return;
+  const initAnimations = () => {
+    if (!window.gsap || !window.ScrollTrigger) return;
 
-  gsap.registerPlugin(ScrollTrigger);
+    gsap.registerPlugin(ScrollTrigger);
 
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduceMotion) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
 
-  const ease = "power3.out";
+    const ease = "power3.out";
+    const scrollFrom = (targets, vars) =>
+      gsap.from(targets, {
+        immediateRender: false,
+        ...vars,
+      });
 
   /* Hero entrance */
   const hero = $("#topo");
@@ -132,7 +204,7 @@
 
   /* Section heads */
   $$(".section-head, .faq__intro").forEach((el) => {
-    gsap.from(el.children, {
+    scrollFrom(el.children, {
       y: 36,
       opacity: 0,
       duration: 0.7,
@@ -147,7 +219,7 @@
   });
 
   /* Gallery cards */
-  gsap.from(".shot-card", {
+  scrollFrom(".shot-card:not(.shot-card--clone)", {
     y: 48,
     opacity: 0,
     scale: 0.96,
@@ -163,9 +235,7 @@
 
   /* Buy block */
   if ($(".buy")) {
-    gsap.set(".buy__info > *", { clearProps: "transform" });
-
-    gsap.from(".buy__media", {
+    scrollFrom(".buy__media", {
       x: -48,
       opacity: 0,
       duration: 0.85,
@@ -177,7 +247,8 @@
       },
     });
 
-    gsap.from(".buy__info > *", {
+    scrollFrom(".buy__info > *", {
+      y: 24,
       opacity: 0,
       duration: 0.55,
       stagger: 0.08,
@@ -190,36 +261,22 @@
     });
   }
 
-  /* Promo duo */
-  gsap.from(".promo-tile", {
-    y: 56,
-    opacity: 0,
-    duration: 0.8,
-    stagger: 0.15,
-    ease,
-    scrollTrigger: {
-      trigger: ".promo-duo",
-      start: "top 80%",
-      toggleActions: "play none none none",
-    },
-  });
-
-  /* Quad grid */
-  gsap.from(".quad__cell", {
+  /* Bento */
+  scrollFrom(".bento__cell", {
     y: 50,
     opacity: 0,
     duration: 0.7,
-    stagger: 0.12,
+    stagger: 0.08,
     ease,
     scrollTrigger: {
-      trigger: ".quad",
+      trigger: ".bento",
       start: "top 78%",
       toggleActions: "play none none none",
     },
   });
 
   /* FAQ */
-  gsap.from(".faq__list details", {
+  scrollFrom(".faq__list details", {
     y: 28,
     opacity: 0,
     duration: 0.5,
@@ -233,7 +290,7 @@
   });
 
   /* Footer */
-  gsap.from(".site-footer", {
+  scrollFrom(".site-footer", {
     y: 24,
     opacity: 0,
     duration: 0.6,
@@ -243,5 +300,18 @@
       start: "top 95%",
       toggleActions: "play none none none",
     },
+  });
+
+    ScrollTrigger.refresh();
+  };
+
+  if (document.readyState === "complete") {
+    initAnimations();
+  } else {
+    window.addEventListener("load", initAnimations, { once: true });
+  }
+
+  window.addEventListener("resize", () => {
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
   });
 })();
