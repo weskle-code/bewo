@@ -778,6 +778,71 @@ body.is-lightbox-open {
   color: var(--bewo-accent);
 }
 
+.buy__qty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.4rem;
+  width: 100%;
+  margin-top: 0.2rem;
+}
+
+.buy__qty-label {
+  font-family: var(--font-bewo-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bewo-lilac-deep);
+}
+
+.buy__qty-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--bewo-lilac-border);
+  border-radius: var(--bewo-radius-button);
+  background: var(--bewo-surface);
+  overflow: hidden;
+}
+
+.buy__qty-btn {
+  width: 4.4rem;
+  height: 4.4rem;
+  border: 0;
+  background: transparent;
+  color: var(--bewo-lilac-deep);
+  font-size: 2rem;
+  line-height: 1;
+  cursor: url("../assets/cursor-default.png") 6 4, pointer;
+  transition: background-color var(--animation-fast), color var(--animation-fast);
+}
+
+.buy__qty-btn:hover {
+  background: var(--bewo-lilac-soft);
+  color: var(--bewo-accent);
+}
+
+.buy__qty-input {
+  width: 4.8rem;
+  height: 4.4rem;
+  border: 0;
+  border-inline: 1px solid var(--bewo-lilac-border);
+  background: transparent;
+  text-align: center;
+  font-family: var(--font-bewo-heading);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--bewo-lilac-deep);
+  -moz-appearance: textfield;
+}
+
+.buy__qty-input::-webkit-outer-spin-button,
+.buy__qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .buy__benefits {
   list-style: none;
   margin: 0.2rem 0 0.6rem;
@@ -851,6 +916,10 @@ body.is-lightbox-open {
   .buy__price {
     justify-content: center;
     width: 100%;
+  }
+
+  .buy__qty {
+    justify-content: center;
   }
 
   .buy__installment {

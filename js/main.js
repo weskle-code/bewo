@@ -126,6 +126,61 @@
 
   initBuyGallery();
 
+  /* ——— Buy quantity → Yampi /r/TOKEN:qty ——— */
+  const initBuyQuantity = () => {
+    const wrap = $("[data-buy-qty]");
+    const input = $("[data-buy-qty-input]");
+    const minus = $("[data-buy-qty-minus]");
+    const plus = $("[data-buy-qty-plus]");
+    const priceEl = $("[data-buy-price]");
+    const installmentEl = $("[data-buy-installment]");
+    const ctas = $$("[data-buy-cta]");
+    if (!wrap || !input) return;
+
+    const UNIT = 69.9;
+    const TOKEN = "8EO7JYYGRF8C";
+    const MIN = 1;
+    const MAX = 20;
+
+    const money = (n) =>
+      n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+    const clamp = (n) => Math.min(MAX, Math.max(MIN, n | 0 || MIN));
+
+    const sync = () => {
+      const qty = clamp(Number(input.value));
+      input.value = String(qty);
+      const total = UNIT * qty;
+      const parcel = total / 3;
+      if (priceEl) priceEl.textContent = money(total);
+      if (installmentEl) {
+        installmentEl.textContent = `3x de ${money(parcel)} sem juros`;
+      }
+      const href = `https://seguro.bewo.com.br/r/${TOKEN}:${qty}`;
+      ctas.forEach((a) => {
+        a.href = href;
+      });
+      $$('a[href*="seguro.bewo.com.br"]').forEach((a) => {
+        if (a.hasAttribute("data-buy-cta")) return;
+        if (/\/[br]\//.test(a.getAttribute("href") || "")) a.href = href;
+      });
+    };
+
+    minus?.addEventListener("click", () => {
+      input.value = String(clamp(Number(input.value) - 1));
+      sync();
+    });
+    plus?.addEventListener("click", () => {
+      input.value = String(clamp(Number(input.value) + 1));
+      sync();
+    });
+    input.addEventListener("change", sync);
+    input.addEventListener("input", sync);
+    sync();
+  };
+
+  initBuyQuantity();
+
   const initInfiniteCarousel = () => {
     const track = $("[data-carousel-track]");
     const prev = $("[data-carousel-prev]");

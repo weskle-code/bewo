@@ -352,21 +352,53 @@
             a Necessaire exclusiva de brinde para levar aonde for.
           </p>
           <div class="buy__price">
-            <span class="buy__price-now">R$ 69,90</span>
+            <span class="buy__price-now" data-buy-price>R$ 69,90</span>
           </div>
-          <p class="buy__installment">3x de R$ 23,30 sem juros</p>
+          <p class="buy__installment" data-buy-installment>3x de R$ 23,30 sem juros</p>
           <ul class="buy__benefits">
             <li>Esfolia e hidrata em um só produto</li>
             <li>Nutrição com Manteiga de Karité</li>
             <li>Toque aveludado, sem ressecar</li>
             <li>+ Necessaire de brinde</li>
           </ul>
+          <div class="buy__qty" data-buy-qty>
+            <span class="buy__qty-label" id="buy-qty-label">Quantidade</span>
+            <div class="buy__qty-controls">
+              <button
+                type="button"
+                class="buy__qty-btn"
+                data-buy-qty-minus
+                aria-label="Diminuir quantidade"
+              >
+                −
+              </button>
+              <input
+                class="buy__qty-input"
+                type="number"
+                inputmode="numeric"
+                min="1"
+                max="20"
+                value="1"
+                data-buy-qty-input
+                aria-labelledby="buy-qty-label"
+              />
+              <button
+                type="button"
+                class="buy__qty-btn"
+                data-buy-qty-plus
+                aria-label="Aumentar quantidade"
+              >
+                +
+              </button>
+            </div>
+          </div>
           <div class="buy__actions">
             <a
               class="btn btn--solid btn--lg"
-              href="https://seguro.bewo.com.br/b/8EO7JYYGRF8C"
+              href="https://seguro.bewo.com.br/r/8EO7JYYGRF8C:1"
               target="_blank"
               rel="noopener noreferrer"
+              data-buy-cta
             >
               Comprar agora
             </a>
@@ -402,7 +434,7 @@
           />
           <a
             class="btn btn--solid"
-            href="https://seguro.bewo.com.br/b/8EO7JYYGRF8C"
+            href="https://seguro.bewo.com.br/r/8EO7JYYGRF8C:1"
             target="_blank"
             rel="noopener noreferrer"
           >Comprar agora</a>
@@ -435,7 +467,7 @@
           </p>
           <a
             class="btn btn--solid"
-            href="https://seguro.bewo.com.br/b/8EO7JYYGRF8C"
+            href="https://seguro.bewo.com.br/r/8EO7JYYGRF8C:1"
             target="_blank"
             rel="noopener noreferrer"
           >Quero o esfoliante</a>
