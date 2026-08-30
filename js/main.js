@@ -2,6 +2,47 @@
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
+  /* ——— Custom Bewo cursor ——— */
+  const initBewoCursor = () => {
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (!fine) return;
+
+    const el = document.createElement("div");
+    el.className = "bewo-cursor";
+    el.setAttribute("aria-hidden", "true");
+    document.body.appendChild(el);
+    document.body.classList.add("has-bewo-cursor");
+
+    /* Hotspot ≈ ponta da seta */
+    const HOT_X = 10;
+    const HOT_Y = 8;
+
+    const move = (x, y) => {
+      el.style.setProperty("--bx", `${x - HOT_X}px`);
+      el.style.setProperty("--by", `${y - HOT_Y}px`);
+    };
+
+    const isTextTarget = (t) =>
+      !!t?.closest?.("input, textarea, select, [contenteditable='true']");
+
+    document.addEventListener(
+      "pointermove",
+      (e) => {
+        move(e.clientX, e.clientY);
+        el.classList.add("is-on");
+        el.classList.toggle("is-hidden", isTextTarget(e.target));
+      },
+      { passive: true }
+    );
+
+    document.addEventListener("pointerdown", () => el.classList.add("is-pressed"));
+    document.addEventListener("pointerup", () => el.classList.remove("is-pressed"));
+    document.addEventListener("pointerleave", () => el.classList.remove("is-on"));
+    window.addEventListener("blur", () => el.classList.remove("is-on", "is-pressed"));
+  };
+
+  initBewoCursor();
+
   /* ——— Password gate ——— */
   const GATE_KEY = "bewo-prevenda-unlock";
   const GATE_PASS = "FINALMENTE";
@@ -13,13 +54,13 @@
   const unlockGate = () => {
     document.body.classList.remove("is-locked");
     try {
-      sessionStorage.setItem(GATE_KEY, "1");
+      localStorage.setItem(GATE_KEY, "1");
     } catch (_) {}
   };
 
   const isUnlocked = () => {
     try {
-      return sessionStorage.getItem(GATE_KEY) === "1";
+      return localStorage.getItem(GATE_KEY) === "1";
     } catch (_) {
       return false;
     }
@@ -119,6 +160,8 @@
       const clone = item.cloneNode(true);
       clone.classList.add("shot-card--clone");
       clone.setAttribute("aria-hidden", "true");
+      const media = clone.querySelector(".shot-card__media");
+      media?.setAttribute("tabindex", "-1");
       clone.querySelector("img")?.setAttribute("alt", "");
       if (position === "prepend") track.insertBefore(clone, track.firstChild);
       else track.appendChild(clone);
@@ -214,9 +257,146 @@
 
     prev?.addEventListener("click", () => scrollByCard(-1));
     next?.addEventListener("click", () => scrollByCard(1));
+
+    /* Lightbox: open on shot click (ignore drag-scroll) */
+    let pointerX = 0;
+    let pointerY = 0;
+    track.addEventListener("pointerdown", (e) => {
+      pointerX = e.clientX;
+      pointerY = e.clientY;
+    });
+    track.addEventListener("click", (e) => {
+      const btn = e.target.closest(".shot-card__media");
+      if (!btn || !track.contains(btn)) return;
+      const moved =
+        Math.abs(e.clientX - pointerX) > 8 || Math.abs(e.clientY - pointerY) > 8;
+      if (moved) return;
+      const img = btn.querySelector("img");
+      if (!img?.src) return;
+      openLightbox(img.src, img.getAttribute("alt") || "");
+    });
   };
 
+  const lightbox = $("[data-lightbox]");
+  const lightboxImg = $("[data-lightbox-img]");
+  let lightboxLastFocus = null;
+
+  const closeLightbox = () => {
+    if (!lightbox || lightbox.hidden) return;
+    lightbox.hidden = true;
+    document.body.classList.remove("is-lightbox-open");
+    lightboxLastFocus?.focus?.();
+  };
+
+  const openLightbox = (src, alt) => {
+    if (!lightbox || !lightboxImg) return;
+    lightboxLastFocus = document.activeElement;
+    lightboxImg.src = src;
+    lightboxImg.alt = alt;
+    lightbox.hidden = false;
+    document.body.classList.add("is-lightbox-open");
+    $("[data-lightbox-close].lightbox__close")?.focus();
+  };
+
+  $$("[data-lightbox-close]").forEach((el) => {
+    el.addEventListener("click", closeLightbox);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeLightbox();
+  });
+
   initInfiniteCarousel();
+
+  /* ——— Hero banner carousel ——— */
+  const initHeroCarousel = () => {
+    const root = $("[data-hero-carousel]");
+    if (!root) return;
+
+    const slides = $$("[data-hero-slide]", root);
+    const dotsWrap = $("[data-hero-dots]", root);
+    const prev = $("[data-hero-prev]", root);
+    const next = $("[data-hero-next]", root);
+    if (slides.length < 2) return;
+
+    let index = 0;
+    let timer;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const dots = slides.map((_, i) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "hero__dot";
+      btn.setAttribute("aria-label", `Ir para slide ${i + 1}`);
+      btn.addEventListener("click", () => goTo(i));
+      dotsWrap?.appendChild(btn);
+      return btn;
+    });
+
+    const render = () => {
+      slides.forEach((slide, i) => {
+        slide.classList.toggle("is-active", i === index);
+      });
+      dots.forEach((dot, i) => {
+        dot.classList.toggle("is-active", i === index);
+      });
+    };
+
+    const goTo = (i) => {
+      index = (i + slides.length) % slides.length;
+      render();
+      restart();
+    };
+
+    const stop = () => clearInterval(timer);
+    const restart = () => {
+      stop();
+      if (reduceMotion) return;
+      timer = setInterval(() => goTo(index + 1), 5200);
+    };
+
+    prev?.addEventListener("click", () => goTo(index - 1));
+    next?.addEventListener("click", () => goTo(index + 1));
+
+    const buySection = $("#comprar");
+    $$(".hero__slide-link", root).forEach((link) => {
+      link.addEventListener("click", (e) => {
+        if (!buySection) return;
+        e.preventDefault();
+        buySection.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.replaceState(null, "", "#comprar");
+      });
+    });
+
+    root.addEventListener("mouseenter", stop);
+    root.addEventListener("mouseleave", restart);
+    root.addEventListener("focusin", stop);
+    root.addEventListener("focusout", restart);
+
+    let touchX = 0;
+    root.addEventListener(
+      "touchstart",
+      (e) => {
+        touchX = e.changedTouches[0].clientX;
+        stop();
+      },
+      { passive: true }
+    );
+    root.addEventListener(
+      "touchend",
+      (e) => {
+        const dx = e.changedTouches[0].clientX - touchX;
+        if (Math.abs(dx) > 40) goTo(index + (dx < 0 ? 1 : -1));
+        else restart();
+      },
+      { passive: true }
+    );
+
+    render();
+    restart();
+  };
+
+  initHeroCarousel();
 
   const initAnimations = () => {
     if (!window.gsap || !window.ScrollTrigger) return;
@@ -236,52 +416,18 @@
   /* Hero entrance */
   const hero = $("#topo");
   if (hero) {
-    const heroTl = gsap.timeline({ defaults: { ease } });
-
-    heroTl
-      .from(".hero__watermark img", {
-        scale: 1.18,
-        opacity: 0,
-        duration: 1.2,
-      })
-      .from(
-        ".hero__media img",
-        {
-          y: 80,
-          opacity: 0,
-          scale: 0.92,
-          duration: 1.05,
-        },
-        "-=0.75"
-      )
-      .from(
-        ".hero__cta .eyebrow",
-        { y: 24, opacity: 0, duration: 0.45 },
-        "-=0.45"
-      )
-      .from(".hero__cta h1", { y: 36, opacity: 0, duration: 0.55 }, "-=0.28")
-      .from(".hero__lead", { y: 24, opacity: 0, duration: 0.45 }, "-=0.3")
-      .from(".hero__cta .btn", { y: 20, opacity: 0, duration: 0.45 }, "-=0.25");
-
-    /* Continuous hero loops */
-    gsap.to(".hero__watermark img", {
-      scale: 1.04,
-      duration: 5.5,
-      ease: "sine.inOut",
-      yoyo: true,
-      repeat: -1,
+    gsap.from(".hero__viewport", {
+      opacity: 0,
+      scale: 1.02,
+      duration: 0.9,
+      ease,
     });
-
-    /* Parallax on watermark only */
-    gsap.to(".hero__watermark", {
-      yPercent: 14,
-      ease: "none",
-      scrollTrigger: {
-        trigger: hero,
-        start: "top top",
-        end: "bottom top",
-        scrub: true,
-      },
+    gsap.from(".hero__controls", {
+      y: 16,
+      opacity: 0,
+      duration: 0.5,
+      delay: 0.35,
+      ease,
     });
   }
 

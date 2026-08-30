@@ -37,7 +37,7 @@
         />
         <p class="eyebrow eyebrow--pill">pré-venda</p>
         <h1 class="gate__title">Acesso exclusivo</h1>
-        <p class="gate__lead">Digite a senha para entrar na landing.</p>
+        <p class="gate__lead">Digite a senha para entrar no beworld.</p>
         <label class="gate__label" for="gate-password">Senha</label>
         <input
           id="gate-password"
@@ -59,34 +59,89 @@
     <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
 
     <main id="conteudo">
-      <section class="hero" id="topo" aria-label="Lançamento">
-        <div class="hero__watermark" aria-hidden="true">
+      <section class="hero" id="topo" aria-label="Lançamento" data-hero-carousel>
+        <h1 class="sr-only">Esfoliante corporal Bewo — pré-venda com necessaire de brinde</h1>
+
+        <a class="hero__brand" href="#topo" aria-label="Bewo — início">
           <img
-            src="https://cdn.shopify.com/s/files/1/0831/1776/8925/files/logo-bewo-laranja-1024x495.png?width=1600"
-            alt=""
+            src="./assets/bewo-logo.png"
+            alt="Bewo"
+            width="200"
+            height="80"
           />
+        </a>
+
+        <div class="hero__viewport">
+          <ul class="hero__track" data-hero-track>
+            <li class="hero__slide is-active" data-hero-slide>
+              <a class="hero__slide-link" href="#comprar">
+                <img
+                  src="./assets/hero/slide-1.webp"
+                  alt="Finalmente!!! Depois de 2 anos de desenvolvimento, veio aí o esfoliante perfeito"
+                  width="1920"
+                  height="1080"
+                />
+              </a>
+            </li>
+            <li class="hero__slide" data-hero-slide>
+              <a class="hero__slide-link" href="#comprar">
+                <img
+                  src="./assets/hero/slide-2.webp"
+                  alt="Só na pré-venda você leva a necessaire de presente — i love it"
+                  width="1920"
+                  height="1080"
+                />
+              </a>
+            </li>
+            <li class="hero__slide" data-hero-slide>
+              <a class="hero__slide-link" href="#comprar">
+                <img
+                  src="./assets/hero/slide-3.webp"
+                  alt="Só na pré-venda a necessaire é presente na compra só do esfoliante"
+                  width="1920"
+                  height="1080"
+                />
+              </a>
+            </li>
+          </ul>
         </div>
-        <div class="hero__media">
-          <img
-            src="./assets/espuma-hero.webp"
-            alt="Esfoliante e hidratante corporal Bewo"
-            width="900"
-            height="1100"
-          />
-        </div>
-        <div class="hero__cta">
-          <p class="eyebrow eyebrow--pill">lançamento</p>
-          <h1>
-            <span class="hero__accent">Esfoliante corporal</span>
-          </h1>
-          <p class="hero__lead">
-            <span class="hero__lilac">Necessaire de brinde.</span>
-            <span class="hero__lilac">Manteiga de Karité nutre.</span>
-            <span class="hero__lilac">Esfolia e hidrata.</span>
-          </p>
-          <a class="btn btn--solid" href="#comprar"
-            >Comprar<span class="btn__gap"></span>R$ 69,90</a
+
+        <div class="hero__controls">
+          <button
+            type="button"
+            class="hero__nav hero__nav--prev"
+            data-hero-prev
+            aria-label="Slide anterior"
           >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M15 5l-7 7 7 7"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          <div class="hero__dots" data-hero-dots></div>
+          <button
+            type="button"
+            class="hero__nav hero__nav--next"
+            data-hero-next
+            aria-label="Próximo slide"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M9 5l7 7-7 7"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
         </div>
       </section>
 
@@ -117,92 +172,94 @@
           <div class="carousel__viewport">
             <ul class="carousel__track" data-carousel-track>
               <li class="shot-card">
-                <div class="shot-card__media">
+                <button type="button" class="shot-card__media" aria-label="Ampliar: Esfolia e hidrata sem deixar oleoso">
+                  <img
+                    src="./assets/carousel/shot-1.webp"
+                    alt="Esfolia e hidrata sem deixar oleoso"
+                    width="900"
+                    height="900"
+                  />
+                </button>
+              </li>
+              <li class="shot-card">
+                <button type="button" class="shot-card__media" aria-label="Ampliar: Necessaire de presente exclusiva da pré-venda">
                   <img
                     src="./assets/carousel/shot-2.webp"
-                    alt="Tampa lilás do esfoliante Bewo"
+                    alt="Necessaire de presente exclusiva da pré-venda"
+                    width="900"
+                    height="900"
                   />
-                </div>
+                </button>
               </li>
               <li class="shot-card">
-                <div class="shot-card__media">
+                <button type="button" class="shot-card__media" aria-label="Ampliar: Estamos viciadas em banho premium com Bewo">
                   <img
                     src="./assets/carousel/shot-3.webp"
-                    alt="Esfoliante Bewo aberto com textura"
+                    alt="Estamos viciadas em banho premium com Bewo"
+                    width="900"
+                    height="900"
                   />
-                </div>
+                </button>
               </li>
               <li class="shot-card">
-                <div class="shot-card__media">
+                <button type="button" class="shot-card__media" aria-label="Ampliar: Esfoliante Bewo aberto com textura">
                   <img
                     src="./assets/carousel/shot-4.webp"
-                    alt="Benefícios do esfoliante Bewo"
+                    alt="Esfoliante Bewo aberto com textura"
+                    width="900"
+                    height="900"
                   />
-                </div>
+                </button>
               </li>
               <li class="shot-card">
-                <div class="shot-card__media">
+                <button type="button" class="shot-card__media" aria-label="Ampliar: Cheirinho de Bewo — quem conhece, ama">
                   <img
                     src="./assets/carousel/shot-5.webp"
-                    alt="Rótulo e modo de usar do esfoliante Bewo"
+                    alt="Cheirinho de Bewo — quem conhece, ama"
+                    width="900"
+                    height="900"
                   />
-                </div>
+                </button>
               </li>
               <li class="shot-card">
-                <div class="shot-card__media">
+                <button type="button" class="shot-card__media" aria-label="Ampliar: Esfoliante Bewo na mão">
+                  <img
+                    src="./assets/carousel/shot-6.webp"
+                    alt="Esfoliante Bewo na mão"
+                    width="900"
+                    height="900"
+                  />
+                </button>
+              </li>
+              <li class="shot-card">
+                <button type="button" class="shot-card__media" aria-label="Ampliar: Tampa lilás do esfoliante Bewo">
                   <img
                     src="./assets/carousel/shot-7.webp"
-                    alt="Necessaire Bewo fechada"
+                    alt="Tampa lilás do esfoliante Bewo"
+                    width="900"
+                    height="900"
                   />
-                </div>
+                </button>
               </li>
               <li class="shot-card">
-                <div class="shot-card__media">
+                <button type="button" class="shot-card__media" aria-label="Ampliar: Detalhe da tampa Bewo com gotas d'água">
                   <img
                     src="./assets/carousel/shot-8.webp"
-                    alt="Necessaire Bewo parcialmente aberta"
+                    alt="Detalhe da tampa Bewo com gotas d'água"
+                    width="900"
+                    height="900"
                   />
-                </div>
+                </button>
               </li>
               <li class="shot-card">
-                <div class="shot-card__media">
+                <button type="button" class="shot-card__media" aria-label="Ampliar: Textura do esfoliante Bewo">
                   <img
                     src="./assets/carousel/shot-9.webp"
-                    alt="Necessaire Bewo vista superior"
+                    alt="Textura do esfoliante Bewo"
+                    width="900"
+                    height="900"
                   />
-                </div>
-              </li>
-              <li class="shot-card">
-                <div class="shot-card__media">
-                  <img
-                    src="./assets/carousel/shot-10.webp"
-                    alt="Esfoliante e necessaire Bewo"
-                  />
-                </div>
-              </li>
-              <li class="shot-card">
-                <div class="shot-card__media">
-                  <img
-                    src="./assets/carousel/shot-11.webp"
-                    alt="Necessaire Bewo com produto dentro"
-                  />
-                </div>
-              </li>
-              <li class="shot-card">
-                <div class="shot-card__media">
-                  <img
-                    src="./assets/carousel/shot-12.webp"
-                    alt="Necessaire Bewo com itens"
-                  />
-                </div>
-              </li>
-              <li class="shot-card">
-                <div class="shot-card__media">
-                  <img
-                    src="./assets/carousel/shot-13.webp"
-                    alt="Esfoliante Bewo na mão"
-                  />
-                </div>
+                </button>
               </li>
             </ul>
           </div>
@@ -255,9 +312,14 @@
             <li>+ Necessaire de brinde</li>
           </ul>
           <div class="buy__actions">
-            <button type="button" class="btn btn--solid btn--lg" data-add-cart>
+            <a
+              class="btn btn--solid btn--lg"
+              href="https://seguro.bewo.com.br/checkout?skipToCheckout=1&tokenReference=8EO7JYYGRF8C"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Comprar agora
-            </button>
+            </a>
           </div>
         </div>
       </section>
@@ -265,8 +327,10 @@
       <section class="bento" id="rotina" aria-label="Por que a Bewo">
         <figure class="bento__cell bento__cell--image">
           <img
-            src="./assets/carousel/shot-13.webp"
-            alt="Esfoliante Bewo na mão"
+            src="./assets/bento-lid.webp"
+            alt="Tampa lilás do esfoliante Bewo"
+            width="1000"
+            height="1000"
           />
         </figure>
 
@@ -281,17 +345,21 @@
 
         <article class="bento__cell bento__cell--media">
           <img
-            src="./assets/necessaire-bento.webp"
-            alt="Necessaire exclusiva Bewo"
+            src="./assets/bento-media.webp"
+            alt="Modelo com o esfoliante Bewo"
+            width="1000"
+            height="1000"
           />
           <a class="btn btn--solid" href="#comprar">Comprar agora</a>
         </article>
 
         <article class="bento__cell bento__cell--copy">
           <img
-            src="./assets/carousel/shot-3.webp"
+            src="./assets/bento-copy.webp"
             alt=""
             aria-hidden="true"
+            width="1000"
+            height="1000"
           />
           <div class="bento__overlay">
             <p class="eyebrow">product care</p>
@@ -316,8 +384,10 @@
 
         <figure class="bento__cell bento__cell--image">
           <img
-            src="./assets/carousel/shot-10.webp"
-            alt="Esfoliante e necessaire Bewo"
+            src="./assets/bento-copy.webp"
+            alt="Textura do esfoliante Bewo"
+            width="1000"
+            height="1000"
           />
         </figure>
       </section>
@@ -361,6 +431,41 @@
     </footer>
 
     <div class="toast" data-toast hidden>Espuma adicionada ao carrinho</div>
+
+    <div
+      class="lightbox"
+      data-lightbox
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-label="Foto ampliada"
+    >
+      <button
+        type="button"
+        class="lightbox__backdrop"
+        data-lightbox-close
+        aria-label="Fechar"
+      ></button>
+      <div class="lightbox__dialog">
+        <button
+          type="button"
+          class="lightbox__close"
+          data-lightbox-close
+          aria-label="Fechar foto"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M6 6l12 12M18 6L6 18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+        <img class="lightbox__img" data-lightbox-img alt="" />
+      </div>
+    </div>
 
     <script src="./js/vendor/gsap.min.js" defer></script>
     <script src="./js/vendor/ScrollTrigger.min.js" defer></script>

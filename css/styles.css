@@ -24,6 +24,62 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+input,
+textarea,
+select {
+  cursor: text;
+}
+
+/* Custom Bewo cursor (JS-driven; CSS url() falha em vários Windows/Chrome) */
+@media (hover: hover) and (pointer: fine) {
+  body.has-bewo-cursor,
+  body.has-bewo-cursor * {
+    cursor: none !important;
+  }
+
+  body.has-bewo-cursor input,
+  body.has-bewo-cursor textarea,
+  body.has-bewo-cursor select,
+  body.has-bewo-cursor input *,
+  body.has-bewo-cursor textarea * {
+    cursor: text !important;
+  }
+
+  .bewo-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 3.2rem;
+    height: 3.8rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    pointer-events: none;
+    z-index: 10000;
+    background: url("../assets/cursor-default.png") center / contain no-repeat;
+    --bx: -9999px;
+    --by: -9999px;
+    --bs: 1;
+    transform: translate3d(var(--bx), var(--by), 0) scale(var(--bs));
+    will-change: transform;
+    opacity: 0;
+    transition: opacity 0.12s ease, transform 0.12s ease;
+  }
+
+  .bewo-cursor.is-on {
+    opacity: 0.92;
+  }
+
+  .bewo-cursor.is-pressed {
+    --bs: 0.9;
+    opacity: 0.85;
+  }
+
+  .bewo-cursor.is-hidden {
+    opacity: 0;
+  }
+}
+
 img {
   display: block;
   max-width: 100%;
@@ -78,7 +134,7 @@ h3 {
 }
 
 /* ——— Layout shell (max 1440px) ——— */
-#conteudo > section:not(.hero),
+#conteudo > section,
 .site-footer {
   width: min(calc(100% - 2 * var(--bewo-bento-inset)), var(--page-width));
   max-width: var(--page-width);
@@ -220,117 +276,169 @@ h3 {
   color: var(--bewo-lilac-soft);
 }
 
-/* ——— Hero ——— */
+/* ——— Hero carousel (bento) ——— */
 .hero {
   position: relative;
   isolation: isolate;
-  display: grid;
-  place-content: end center;
-  place-items: center;
-  min-height: min(92vh, 98rem);
+  margin-top: var(--bewo-bento-inset);
+  margin-bottom: 0;
+  padding: 0;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse 70% 55% at 50% 38%, var(--bewo-lilac-soft) 0%, transparent 70%),
-    linear-gradient(180deg, var(--bewo-cream) 0%, var(--bewo-blush) 100%);
-  padding: 2rem max(var(--bewo-bento-inset), calc(50% - var(--page-width) / 2))
-    clamp(4.8rem, 8vw, 7.2rem);
+  border-radius: var(--bewo-radius-lg);
+  background: #fff;
+}
+
+.hero__brand {
+  position: absolute;
+  top: clamp(1.2rem, 2.5vw, 2rem);
+  left: 50%;
+  z-index: 4;
+  transform: translateX(-50%);
+  display: inline-flex;
+  line-height: 0;
+  filter: drop-shadow(0 0.4rem 1.2rem rgb(0 0 0 / 18%));
+}
+
+.hero__brand img {
+  display: block;
+  width: auto;
+  height: clamp(3.2rem, 6vw, 5rem);
+  object-fit: contain;
+}
+
+.hero__viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: inherit;
+  background: #fff;
+}
+
+.hero__track {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  position: relative;
+}
+
+.hero__slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.55s ease,
+    visibility 0.55s ease;
+  pointer-events: none;
+}
+
+.hero__slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 1;
+}
+
+.hero__slide-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.hero__slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  pointer-events: none;
+}
+
+.hero__controls {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(1.2rem, 3vw, 2.4rem);
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--bewo-radius-pill);
+  background: rgb(255 255 255 / 72%);
+  backdrop-filter: blur(8px);
+}
+
+.hero__nav {
+  width: 3.6rem;
+  height: 3.6rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bewo-lilac-soft);
+  color: var(--bewo-ink);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background-color var(--animation-fast), color var(--animation-fast);
+}
+
+.hero__nav svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.hero__nav:hover {
+  background: var(--bewo-accent);
+  color: var(--bewo-surface);
+}
+
+.hero__dots {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.hero__dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--bewo-lilac-border);
+  cursor: pointer;
+  transition:
+    background-color var(--animation-fast),
+    width var(--animation-fast);
+}
+
+.hero__dot.is-active {
+  width: 1.8rem;
+  background: var(--bewo-accent);
 }
 
 @media (max-width: 899.98px) {
   .hero {
-    padding-top: 0.6rem;
-    min-height: min(88vh, 90rem);
+    border-radius: var(--bewo-radius-md);
+  }
+
+  .hero__viewport {
+    aspect-ratio: 16 / 9;
+  }
+
+  .hero__controls {
+    bottom: 0.8rem;
+    gap: 0.6rem;
+    padding: 0.4rem 0.55rem;
+    scale: 0.92;
   }
 }
 
-.hero__watermark {
-  position: absolute;
-  top: 8%;
-  bottom: 28%;
-  left: 0;
-  right: 0;
-  z-index: 0;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
-  user-select: none;
-  will-change: transform;
-}
-
-.hero__watermark img {
-  width: min(92vw, 110rem);
-  height: auto;
-  max-height: 100%;
-  object-fit: contain;
-  opacity: 0.28;
-  will-change: transform, opacity;
-}
-
-.hero__media {
-  position: relative;
-  z-index: 1;
-  width: min(100%, 52rem);
-  margin-bottom: 1.2rem;
-  will-change: transform;
-}
-
-.hero__media img {
-  width: 100%;
-  max-height: min(68vh, 64rem);
-  margin-inline: auto;
-  object-fit: contain;
-  object-position: center bottom;
-  background: transparent;
-  will-change: transform;
-}
-
-.hero__cta {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: min(100%, 52rem);
-  margin-top: 0;
-  padding: 0 2rem;
-  text-align: center;
-}
-
-.hero__cta .eyebrow--pill {
-  margin-bottom: 0.4rem;
-}
-
-.hero__cta .btn {
-  margin-top: 0.4rem;
-}
-
-.hero__cta h1 {
-  font-size: var(--font-h1-size);
-  margin-bottom: 0.8rem;
-}
-
-.hero__accent {
-  color: var(--bewo-accent);
-}
-
-.hero__lilac {
-  color: #ae8583;
-}
-
-.hero__ink {
-  color: var(--bewo-ink);
-}
-
-.hero__lead {
-  margin: 0 auto 2rem;
-  max-width: 32ch;
-  font-size: 1.55rem;
-  font-weight: 600;
-  line-height: 1.5;
-}
-
-.hero__lead span {
-  display: inline-block;
+@media (max-width: 599.98px) {
+  .hero__nav {
+    display: none;
+  }
 }
 
 /* ——— Gallery carousel ——— */
@@ -382,12 +490,93 @@ h3 {
   border-radius: calc(var(--bewo-radius-md) - 0.15rem);
   overflow: hidden;
   background: var(--bewo-lilac-soft);
+  padding: 0;
+  border: 0;
+  display: block;
+  width: 100%;
+  cursor: pointer;
 }
 
 .shot-card__media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  pointer-events: none;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+.lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: rgba(74, 52, 44, 0.72);
+  cursor: pointer;
+}
+
+.lightbox__dialog {
+  position: relative;
+  z-index: 1;
+  max-width: min(92vw, 72rem);
+  max-height: 88vh;
+  border-radius: var(--bewo-radius-lg);
+  overflow: hidden;
+  background: var(--bewo-surface);
+  box-shadow: 0 2.4rem 6rem rgba(74, 52, 44, 0.28);
+}
+
+.lightbox__img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(92vw, 72rem);
+  max-height: 88vh;
+  object-fit: contain;
+}
+
+.lightbox__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2;
+  width: 4rem;
+  height: 4rem;
+  border: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  background: var(--bewo-surface);
+  color: var(--bewo-ink);
+  box-shadow: 0 0.4rem 1.6rem rgba(74, 52, 44, 0.18);
+  transition: background-color var(--animation-fast), color var(--animation-fast);
+}
+
+.lightbox__close:hover {
+  background: var(--bewo-accent);
+  color: var(--bewo-surface);
+}
+
+.lightbox__close svg {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+body.is-lightbox-open {
+  overflow: hidden;
 }
 
 .carousel__nav {
