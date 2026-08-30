@@ -8,7 +8,6 @@
 
 html {
   font-size: 62.5%;
-  scroll-behavior: smooth;
 }
 
 body {
@@ -331,8 +330,7 @@ h3 {
   gap: 1rem;
   padding: 0.6rem 0.8rem;
   border-radius: var(--bewo-radius-pill);
-  background: rgb(255 255 255 / 72%);
-  backdrop-filter: blur(8px);
+  background: rgb(255 255 255 / 88%);
 }
 
 .hero__nav {
@@ -408,6 +406,8 @@ h3 {
 /* ——— Gallery carousel ——— */
 .gallery {
   padding: 5.6rem 0 2rem;
+  content-visibility: auto;
+  contain-intrinsic-size: 400px;
 }
 
 .carousel {
@@ -642,6 +642,8 @@ body.is-lightbox-open {
   padding: 1.6rem;
   border-radius: var(--bewo-radius-lg);
   background: color-mix(in srgb, var(--bewo-lilac-soft) 38%, white);
+  content-visibility: auto;
+  contain-intrinsic-size: 520px;
 }
 
 .buy__media {
@@ -871,6 +873,8 @@ body.is-lightbox-open {
   max-width: calc(var(--bewo-square-size) * 3 + var(--bento-gap) * 2);
   margin-inline: auto;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  content-visibility: auto;
+  contain-intrinsic-size: 900px;
 }
 
 .bento__cell {

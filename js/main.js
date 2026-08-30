@@ -344,6 +344,17 @@
     root.addEventListener("focusin", stop);
     root.addEventListener("focusout", restart);
 
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) restart();
+          else stop();
+        },
+        { threshold: 0.2 }
+      );
+      io.observe(root);
+    }
+
     let touchX = 0;
     root.addEventListener(
       "touchstart",
@@ -369,140 +380,43 @@
 
   initHeroCarousel();
 
+  /* ——— Light reveal (sem ScrollTrigger — evita jank no scroll) ——— */
   const initAnimations = () => {
-    if (!window.gsap || !window.ScrollTrigger) return;
-
-    gsap.registerPlugin(ScrollTrigger);
-
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduceMotion) return;
 
-    const ease = "power3.out";
-    const scrollFrom = (targets, vars) =>
-      gsap.from(targets, {
-        immediateRender: false,
-        ...vars,
+    const heroViewport = $(".hero__viewport");
+    if (heroViewport && window.gsap) {
+      gsap.from(heroViewport, {
+        opacity: 0,
+        duration: 0.55,
+        ease: "power2.out",
       });
+    }
 
-  /* Hero entrance */
-  const hero = $("#topo");
-  if (hero) {
-    gsap.from(".hero__viewport", {
-      opacity: 0,
-      scale: 1.02,
-      duration: 0.9,
-      ease,
-    });
-    gsap.from(".hero__controls", {
-      y: 16,
-      opacity: 0,
-      duration: 0.5,
-      delay: 0.35,
-      ease,
-    });
-  }
+    if (!("IntersectionObserver" in window)) return;
 
-  /* Section heads */
-  $$(".section-head, .faq__intro").forEach((el) => {
-    scrollFrom(el.children, {
-      y: 36,
-      opacity: 0,
-      duration: 0.7,
-      stagger: 0.1,
-      ease,
-      scrollTrigger: {
-        trigger: el,
-        start: "top 85%",
-        toggleActions: "play none none none",
+    const targets = $$(".section-head, .buy, .bento__cell, .faq__list details, .site-footer");
+    targets.forEach((el) => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(16px)";
+      el.style.transition = "opacity 0.45s ease, transform 0.45s ease";
+    });
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          el.style.opacity = "1";
+          el.style.transform = "none";
+          io.unobserve(el);
+        });
       },
-    });
-  });
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.08 }
+    );
 
-  /* Gallery cards */
-  scrollFrom(".shot-card:not(.shot-card--clone)", {
-    y: 48,
-    opacity: 0,
-    scale: 0.96,
-    duration: 0.65,
-    stagger: 0.1,
-    ease,
-    scrollTrigger: {
-      trigger: ".gallery .carousel",
-      start: "top 80%",
-      toggleActions: "play none none none",
-    },
-  });
-
-  /* Buy block */
-  if ($(".buy")) {
-    scrollFrom(".buy__media", {
-      x: -48,
-      opacity: 0,
-      duration: 0.85,
-      ease,
-      scrollTrigger: {
-        trigger: ".buy",
-        start: "top 78%",
-        toggleActions: "play none none none",
-      },
-    });
-
-    scrollFrom(".buy__info > *", {
-      y: 24,
-      opacity: 0,
-      duration: 0.55,
-      stagger: 0.08,
-      ease,
-      scrollTrigger: {
-        trigger: ".buy",
-        start: "top 78%",
-        toggleActions: "play none none none",
-      },
-    });
-  }
-
-  /* Bento */
-  scrollFrom(".bento__cell", {
-    y: 50,
-    opacity: 0,
-    duration: 0.7,
-    stagger: 0.08,
-    ease,
-    scrollTrigger: {
-      trigger: ".bento",
-      start: "top 78%",
-      toggleActions: "play none none none",
-    },
-  });
-
-  /* FAQ */
-  scrollFrom(".faq__list details", {
-    y: 28,
-    opacity: 0,
-    duration: 0.5,
-    stagger: 0.1,
-    ease,
-    scrollTrigger: {
-      trigger: ".faq",
-      start: "top 80%",
-      toggleActions: "play none none none",
-    },
-  });
-
-  /* Footer */
-  scrollFrom(".site-footer", {
-    y: 24,
-    opacity: 0,
-    duration: 0.6,
-    ease,
-    scrollTrigger: {
-      trigger: ".site-footer",
-      start: "top 95%",
-      toggleActions: "play none none none",
-    },
-  });
-
-    ScrollTrigger.refresh();
+    targets.forEach((el) => io.observe(el));
   };
 
   if (document.readyState === "complete") {
@@ -510,12 +424,4 @@
   } else {
     window.addEventListener("load", initAnimations, { once: true });
   }
-
-  let resizeTimer;
-  window.addEventListener("resize", () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      if (window.ScrollTrigger) ScrollTrigger.refresh();
-    }, 200);
-  });
 })();
