@@ -103,6 +103,29 @@
     });
   });
 
+  /* ——— Buy gallery thumbs ——— */
+  const initBuyGallery = () => {
+    const gallery = $("[data-buy-gallery]");
+    const featured = $("[data-buy-featured]");
+    const thumbs = $$("[data-buy-thumb]", gallery || document);
+    if (!gallery || !featured || !thumbs.length) return;
+
+    thumbs.forEach((thumb) => {
+      thumb.addEventListener("click", () => {
+        const img = thumb.querySelector("img");
+        if (!img?.src) return;
+        featured.src = img.currentSrc || img.src;
+        thumbs.forEach((t) => {
+          t.classList.toggle("is-active", t === thumb);
+          if (t === thumb) t.setAttribute("aria-current", "true");
+          else t.removeAttribute("aria-current");
+        });
+      });
+    });
+  };
+
+  initBuyGallery();
+
   const initInfiniteCarousel = () => {
     const track = $("[data-carousel-track]");
     const prev = $("[data-carousel-prev]");
