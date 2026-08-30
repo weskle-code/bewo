@@ -126,7 +126,7 @@
 
   initBuyGallery();
 
-  /* ——— Buy quantity → Yampi /r/TOKEN:qty ——— */
+  /* ——— Buy quantity (preço na LP; checkout usa botão /b/) ——— */
   const initBuyQuantity = () => {
     const wrap = $("[data-buy-qty]");
     const input = $("[data-buy-qty-input]");
@@ -134,11 +134,9 @@
     const plus = $("[data-buy-qty-plus]");
     const priceEl = $("[data-buy-price]");
     const installmentEl = $("[data-buy-installment]");
-    const ctas = $$("[data-buy-cta]");
     if (!wrap || !input) return;
 
     const UNIT = 69.9;
-    const TOKEN = "8EO7JYYGRF8C";
     const MIN = 1;
     const MAX = 20;
 
@@ -156,14 +154,6 @@
       if (installmentEl) {
         installmentEl.textContent = `3x de ${money(parcel)} sem juros`;
       }
-      const href = `https://seguro.bewo.com.br/r/${TOKEN}:${qty}`;
-      ctas.forEach((a) => {
-        a.href = href;
-      });
-      $$('a[href*="seguro.bewo.com.br"]').forEach((a) => {
-        if (a.hasAttribute("data-buy-cta")) return;
-        if (/\/[br]\//.test(a.getAttribute("href") || "")) a.href = href;
-      });
     };
 
     minus?.addEventListener("click", () => {
