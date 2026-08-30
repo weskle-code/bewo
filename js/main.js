@@ -59,9 +59,12 @@
     const track = $("[data-carousel-track]");
     const prev = $("[data-carousel-prev]");
     const next = $("[data-carousel-next]");
+    const dotsWrap = $("[data-carousel-dots]");
     if (!track) return;
 
-    const originals = $$(".shot-card", track);
+    const originals = $$(".shot-card", track).filter(
+      (el) => !el.classList.contains("shot-card--clone")
+    );
     if (originals.length < 2) return;
 
     const cloneSlide = (item, position) => {
@@ -84,6 +87,31 @@
     const getSetWidth = () => getStep() * originals.length;
 
     let isJumping = false;
+    let activeIndex = 0;
+
+    const dots = originals.map((_, i) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "carousel__dot";
+      btn.setAttribute("aria-label", `Ir para foto ${i + 1}`);
+      btn.addEventListener("click", () => {
+        track.scrollTo({ left: getSetWidth() + i * getStep(), behavior: "smooth" });
+      });
+      dotsWrap?.appendChild(btn);
+      return btn;
+    });
+
+    const syncDots = () => {
+      if (!dots.length) return;
+      const step = getStep();
+      if (!step) return;
+      const setWidth = getSetWidth();
+      const raw = Math.round((track.scrollLeft - setWidth) / step);
+      const index = ((raw % originals.length) + originals.length) % originals.length;
+      if (index === activeIndex) return;
+      activeIndex = index;
+      dots.forEach((dot, i) => dot.classList.toggle("is-active", i === index));
+    };
 
     const normalizeScroll = () => {
       if (isJumping) return;
@@ -96,6 +124,7 @@
         track.style.scrollBehavior = "";
         requestAnimationFrame(() => {
           isJumping = false;
+          syncDots();
         });
       } else if (track.scrollLeft <= 1) {
         isJumping = true;
@@ -104,13 +133,18 @@
         track.style.scrollBehavior = "";
         requestAnimationFrame(() => {
           isJumping = false;
+          syncDots();
         });
+      } else {
+        syncDots();
       }
     };
 
     track.style.scrollBehavior = "auto";
     track.scrollLeft = getSetWidth();
     track.style.scrollBehavior = "";
+    syncDots();
+    dots[0]?.classList.add("is-active");
 
     window.addEventListener(
       "load",
@@ -118,6 +152,7 @@
         track.style.scrollBehavior = "auto";
         track.scrollLeft = getSetWidth();
         track.style.scrollBehavior = "";
+        syncDots();
       },
       { once: true }
     );
