@@ -2,6 +2,54 @@
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
+  /* ——— Password gate ——— */
+  const GATE_KEY = "bewo-prevenda-unlock";
+  const GATE_PASS = "FINALMENTE";
+  const gate = $("[data-gate]");
+  const gateForm = $("[data-gate-form]");
+  const gateInput = $("[data-gate-input]");
+  const gateError = $("[data-gate-error]");
+
+  const unlockGate = () => {
+    document.body.classList.remove("is-locked");
+    try {
+      sessionStorage.setItem(GATE_KEY, "1");
+    } catch (_) {}
+  };
+
+  const isUnlocked = () => {
+    try {
+      return sessionStorage.getItem(GATE_KEY) === "1";
+    } catch (_) {
+      return false;
+    }
+  };
+
+  if (isUnlocked()) {
+    unlockGate();
+  } else {
+    document.body.classList.add("is-locked");
+    gateInput?.focus();
+  }
+
+  gateForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const value = (gateInput?.value || "").trim();
+    if (value.toUpperCase() === GATE_PASS) {
+      if (gateError) gateError.hidden = true;
+      unlockGate();
+      return;
+    }
+    if (gateError) gateError.hidden = false;
+    if (gateInput) {
+      gateInput.value = "";
+      gateInput.focus();
+    }
+    if (window.gsap && gate) {
+      gsap.fromTo(gate.querySelector(".gate__card"), { x: -8 }, { x: 0, duration: 0.35, ease: "elastic.out(1, 0.4)" });
+    }
+  });
+
   /* ——— UI: cart / carousel ——— */
   const cartEls = $$("[data-cart-count]");
   const toast = $("[data-toast]");

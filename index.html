@@ -25,7 +25,37 @@
     <link rel="stylesheet" href="./design-system/tokens.css" />
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
-  <body>
+  <body class="is-locked">
+    <div class="gate" data-gate>
+      <form class="gate__card" data-gate-form autocomplete="off">
+        <img
+          class="gate__logo"
+          src="./assets/favicon.png"
+          alt="Bewo"
+          width="64"
+          height="64"
+        />
+        <p class="eyebrow eyebrow--pill">pré-venda</p>
+        <h1 class="gate__title">Acesso exclusivo</h1>
+        <p class="gate__lead">Digite a senha para entrar na landing.</p>
+        <label class="gate__label" for="gate-password">Senha</label>
+        <input
+          id="gate-password"
+          class="gate__input"
+          type="password"
+          name="password"
+          data-gate-input
+          placeholder="••••••••"
+          required
+          autofocus
+        />
+        <p class="gate__error" data-gate-error hidden>Senha incorreta. Tente de novo.</p>
+        <button class="btn btn--solid btn--lg gate__btn" type="submit">
+          Entrar
+        </button>
+      </form>
+    </div>
+
     <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
 
     <main id="conteudo">
