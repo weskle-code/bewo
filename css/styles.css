@@ -30,19 +30,25 @@ select {
   cursor: text;
 }
 
-/* Custom Bewo cursor (JS-driven; CSS url() falha em vários Windows/Chrome) */
+/* Custom Bewo cursor */
 @media (hover: hover) and (pointer: fine) {
-  body.has-bewo-cursor,
-  body.has-bewo-cursor * {
-    cursor: none !important;
+  html.has-bewo-cursor,
+  html.has-bewo-cursor body {
+    cursor: none;
   }
 
-  body.has-bewo-cursor input,
-  body.has-bewo-cursor textarea,
-  body.has-bewo-cursor select,
-  body.has-bewo-cursor input *,
-  body.has-bewo-cursor textarea * {
-    cursor: text !important;
+  html.has-bewo-cursor a,
+  html.has-bewo-cursor button,
+  html.has-bewo-cursor summary,
+  html.has-bewo-cursor label,
+  html.has-bewo-cursor .shot-card__media {
+    cursor: none;
+  }
+
+  html.has-bewo-cursor input,
+  html.has-bewo-cursor textarea,
+  html.has-bewo-cursor select {
+    cursor: text;
   }
 
   .bewo-cursor {
@@ -56,14 +62,11 @@ select {
     border: 0;
     pointer-events: none;
     z-index: 10000;
-    background: url("../assets/cursor-default.png") center / contain no-repeat;
-    --bx: -9999px;
-    --by: -9999px;
-    --bs: 1;
-    transform: translate3d(var(--bx), var(--by), 0) scale(var(--bs));
-    will-change: transform;
+    background: url("../assets/cursor-default.png") 0 0 / contain no-repeat;
     opacity: 0;
-    transition: opacity 0.12s ease, transform 0.12s ease;
+    transform: translate3d(-9999px, -9999px, 0);
+    transition: opacity 0.12s ease;
+    contain: layout style paint;
   }
 
   .bewo-cursor.is-on {
@@ -71,7 +74,6 @@ select {
   }
 
   .bewo-cursor.is-pressed {
-    --bs: 0.9;
     opacity: 0.85;
   }
 

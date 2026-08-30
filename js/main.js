@@ -2,7 +2,7 @@
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
-  /* ——— Custom Bewo cursor ——— */
+  /* ——— Custom Bewo cursor (rAF, sem transition em transform) ——— */
   const initBewoCursor = () => {
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     if (!fine) return;
@@ -11,15 +11,25 @@
     el.className = "bewo-cursor";
     el.setAttribute("aria-hidden", "true");
     document.body.appendChild(el);
-    document.body.classList.add("has-bewo-cursor");
+    document.documentElement.classList.add("has-bewo-cursor");
 
-    /* Hotspot ≈ ponta da seta */
     const HOT_X = 10;
     const HOT_Y = 8;
+    let x = -9999;
+    let y = -9999;
+    let pressed = false;
+    let raf = 0;
+    let visible = false;
+    let textMode = false;
 
-    const move = (x, y) => {
-      el.style.setProperty("--bx", `${x - HOT_X}px`);
-      el.style.setProperty("--by", `${y - HOT_Y}px`);
+    const paint = () => {
+      raf = 0;
+      const scale = pressed ? 0.9 : 1;
+      el.style.transform = `translate3d(${x - HOT_X}px, ${y - HOT_Y}px, 0) scale(${scale})`;
+    };
+
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(paint);
     };
 
     const isTextTarget = (t) =>
@@ -28,17 +38,41 @@
     document.addEventListener(
       "pointermove",
       (e) => {
-        move(e.clientX, e.clientY);
-        el.classList.add("is-on");
-        el.classList.toggle("is-hidden", isTextTarget(e.target));
+        x = e.clientX;
+        y = e.clientY;
+        schedule();
+        if (!visible) {
+          visible = true;
+          el.classList.add("is-on");
+        }
+        const nextText = isTextTarget(e.target);
+        if (nextText !== textMode) {
+          textMode = nextText;
+          el.classList.toggle("is-hidden", textMode);
+        }
       },
       { passive: true }
     );
 
-    document.addEventListener("pointerdown", () => el.classList.add("is-pressed"));
-    document.addEventListener("pointerup", () => el.classList.remove("is-pressed"));
-    document.addEventListener("pointerleave", () => el.classList.remove("is-on"));
-    window.addEventListener("blur", () => el.classList.remove("is-on", "is-pressed"));
+    document.addEventListener("pointerdown", () => {
+      pressed = true;
+      el.classList.add("is-pressed");
+      schedule();
+    });
+    document.addEventListener("pointerup", () => {
+      pressed = false;
+      el.classList.remove("is-pressed");
+      schedule();
+    });
+    document.addEventListener("pointerleave", () => {
+      visible = false;
+      el.classList.remove("is-on");
+    });
+    window.addEventListener("blur", () => {
+      pressed = false;
+      visible = false;
+      el.classList.remove("is-on", "is-pressed");
+    });
   };
 
   initBewoCursor();
@@ -207,21 +241,24 @@
     const normalizeScroll = () => {
       if (isJumping) return;
       const setWidth = getSetWidth();
+      if (!setWidth) return;
 
       if (track.scrollLeft >= setWidth * 2 - 1) {
         isJumping = true;
+        const prev = track.style.scrollBehavior;
         track.style.scrollBehavior = "auto";
         track.scrollLeft -= setWidth;
-        track.style.scrollBehavior = "";
+        track.style.scrollBehavior = prev;
         requestAnimationFrame(() => {
           isJumping = false;
           syncDots();
         });
       } else if (track.scrollLeft <= 1) {
         isJumping = true;
+        const prev = track.style.scrollBehavior;
         track.style.scrollBehavior = "auto";
         track.scrollLeft += setWidth;
-        track.style.scrollBehavior = "";
+        track.style.scrollBehavior = prev;
         requestAnimationFrame(() => {
           isJumping = false;
           syncDots();
@@ -229,6 +266,15 @@
       } else {
         syncDots();
       }
+    };
+
+    let scrollRaf = 0;
+    const onScroll = () => {
+      if (scrollRaf) return;
+      scrollRaf = requestAnimationFrame(() => {
+        scrollRaf = 0;
+        normalizeScroll();
+      });
     };
 
     track.style.scrollBehavior = "auto";
@@ -248,7 +294,7 @@
       { once: true }
     );
 
-    track.addEventListener("scroll", normalizeScroll, { passive: true });
+    track.addEventListener("scroll", onScroll, { passive: true });
     track.addEventListener("scrollend", normalizeScroll);
 
     const scrollByCard = (dir) => {
@@ -540,7 +586,11 @@
     window.addEventListener("load", initAnimations, { once: true });
   }
 
+  let resizeTimer;
   window.addEventListener("resize", () => {
-    if (window.ScrollTrigger) ScrollTrigger.refresh();
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
+    }, 200);
   });
 })();
