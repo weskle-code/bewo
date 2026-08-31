@@ -126,7 +126,7 @@
 
   initBuyGallery();
 
-  /* ——— Buy quantity (preço na LP; checkout usa botão /b/) ——— */
+  /* ——— Buy quantity → Yampi kit cart with qty ——— */
   const initBuyQuantity = () => {
     const wrap = $("[data-buy-qty]");
     const input = $("[data-buy-qty-input]");
@@ -139,11 +139,34 @@
     const UNIT = 69.9;
     const MIN = 1;
     const MAX = 20;
+    const STORE_TOKEN = "KUnrhC4TpVRWiAQLILVoXtrsLhzfxyw6ARpQlKzP";
+    const BUNDLE_ID = "308300";
+    const OPTION_GIFT = "304074940"; // necessaire
+    const OPTION_MAIN = "304074941"; // esfoliante
+    const TOKEN_REF = "8EO7JYYGRF8C";
 
     const money = (n) =>
       n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
     const clamp = (n) => Math.min(MAX, Math.max(MIN, n | 0 || MIN));
+
+    const checkoutUrl = (qty) => {
+      const q = clamp(qty);
+      const params = new URLSearchParams({
+        bundle_id: BUNDLE_ID,
+        clearCart: "1",
+        "metadata[source_platform]": "bundle_link",
+        "product_option_id[0]": OPTION_GIFT,
+        "product_option_id[1]": OPTION_MAIN,
+        "quantity[0]": String(q),
+        "quantity[1]": String(q),
+        redirectTo: "checkout",
+        skipToCheckout: "1",
+        store_token: STORE_TOKEN,
+        tokenReference: TOKEN_REF,
+      });
+      return `https://seguro.bewo.com.br/cart/items?${params.toString()}`;
+    };
 
     const sync = () => {
       const qty = clamp(Number(input.value));
@@ -154,6 +177,10 @@
       if (installmentEl) {
         installmentEl.textContent = `3x de ${money(parcel)} sem juros`;
       }
+      const href = checkoutUrl(qty);
+      $$('a[href*="seguro.bewo.com.br"]').forEach((a) => {
+        a.href = href;
+      });
     };
 
     minus?.addEventListener("click", () => {
