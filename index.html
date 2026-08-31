@@ -58,18 +58,43 @@
 
     <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
 
+    <header class="site-head">
+      <a class="site-head__brand" href="#topo" aria-label="Bewo — início">
+        <img
+          src="./assets/bewo-logo.png"
+          alt="Bewo"
+          width="200"
+          height="80"
+        />
+      </a>
+      <button
+        type="button"
+        class="site-head__cart"
+        data-cart-open
+        aria-label="Abrir carrinho"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="8" cy="21" r="1" />
+          <circle cx="19" cy="21" r="1" />
+          <path
+            d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"
+          />
+        </svg>
+        <span class="site-head__cart-count" data-cart-count>0</span>
+      </button>
+    </header>
+
     <main id="conteudo">
       <section class="hero" id="topo" aria-label="Lançamento" data-hero-carousel>
         <h1 class="sr-only">Esfoliante corporal Bewo — pré-venda com necessaire de brinde</h1>
-
-        <a class="hero__brand" href="#topo" aria-label="Bewo — início">
-          <img
-            src="./assets/bewo-logo.png"
-            alt="Bewo"
-            width="200"
-            height="80"
-          />
-        </a>
 
         <div class="hero__viewport">
           <ul class="hero__track" data-hero-track>
@@ -393,16 +418,128 @@
             </div>
           </div>
           <div class="buy__actions">
-            <a
+            <button
+              type="button"
               class="btn btn--solid btn--lg"
-              href="https://seguro.bewo.com.br/cart/items?bundle_id=308300&clearCart=1&metadata%5Bsource_platform%5D=bundle_link&product_option_id%5B0%5D=304074940&product_option_id%5B1%5D=304074941&quantity%5B0%5D=1&quantity%5B1%5D=1&redirectTo=checkout&skipToCheckout=1&store_token=KUnrhC4TpVRWiAQLILVoXtrsLhzfxyw6ARpQlKzP&tokenReference=8EO7JYYGRF8C"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-buy-cta
+              data-add-product="kit"
+            >
+              Adicionar ao carrinho
+            </button>
+            <button
+              type="button"
+              class="btn btn--lilac btn--lg"
+              data-buy-now="kit"
             >
               Comprar agora
-            </a>
+            </button>
           </div>
+        </div>
+      </section>
+
+      <section class="shop" id="loja" aria-labelledby="shop-heading">
+        <div class="section-head">
+          <p class="eyebrow eyebrow--pill">leva junto</p>
+          <h2 id="shop-heading">Complete a rotina Bewo</h2>
+        </div>
+        <div class="shop__grid">
+          <article class="shop-card" data-product-card="espuma">
+            <div class="shop-card__media">
+              <img
+                src="./assets/shop/espuma.webp"
+                alt="Espuma depilatória Bewo"
+                width="800"
+                height="800"
+              />
+            </div>
+            <div class="shop-card__body">
+              <h3>Espuma</h3>
+              <p class="shop-card__desc">
+                Textura de nuvem para facilitar a depilação e hidratar a pele.
+              </p>
+              <p class="shop-card__price">R$ 49,90</p>
+              <div class="shop-card__actions">
+                <div class="buy__qty-controls" data-shop-qty="espuma">
+                  <button
+                    type="button"
+                    class="buy__qty-btn"
+                    data-shop-qty-minus
+                    aria-label="Diminuir quantidade"
+                  >
+                    −
+                  </button>
+                  <input
+                    class="buy__qty-input"
+                    type="number"
+                    min="1"
+                    max="20"
+                    value="1"
+                    data-shop-qty-input
+                    aria-label="Quantidade Espuma"
+                  />
+                  <button
+                    type="button"
+                    class="buy__qty-btn"
+                    data-shop-qty-plus
+                    aria-label="Aumentar quantidade"
+                  >
+                    +
+                  </button>
+                </div>
+                <button type="button" class="btn btn--solid" data-add-product="espuma">
+                  Adicionar
+                </button>
+              </div>
+            </div>
+          </article>
+          <article class="shop-card" data-product-card="bruma">
+            <div class="shop-card__media">
+              <img
+                src="./assets/shop/bruma.webp"
+                alt="Bruma pós depilatória Bewo"
+                width="800"
+                height="800"
+              />
+            </div>
+            <div class="shop-card__body">
+              <h3>Bruma pós depilatória</h3>
+              <p class="shop-card__desc">
+                Ajuda a tratar e prevenir foliculite depois da depilação.
+              </p>
+              <p class="shop-card__price">R$ 79,90</p>
+              <div class="shop-card__actions">
+                <div class="buy__qty-controls" data-shop-qty="bruma">
+                  <button
+                    type="button"
+                    class="buy__qty-btn"
+                    data-shop-qty-minus
+                    aria-label="Diminuir quantidade"
+                  >
+                    −
+                  </button>
+                  <input
+                    class="buy__qty-input"
+                    type="number"
+                    min="1"
+                    max="20"
+                    value="1"
+                    data-shop-qty-input
+                    aria-label="Quantidade Bruma"
+                  />
+                  <button
+                    type="button"
+                    class="buy__qty-btn"
+                    data-shop-qty-plus
+                    aria-label="Aumentar quantidade"
+                  >
+                    +
+                  </button>
+                </div>
+                <button type="button" class="btn btn--solid" data-add-product="bruma">
+                  Adicionar
+                </button>
+              </div>
+            </div>
+          </article>
         </div>
       </section>
 
@@ -432,12 +569,7 @@
             width="1000"
             height="1000"
           />
-          <a
-            class="btn btn--solid"
-            href="https://seguro.bewo.com.br/cart/items?bundle_id=308300&clearCart=1&metadata%5Bsource_platform%5D=bundle_link&product_option_id%5B0%5D=304074940&product_option_id%5B1%5D=304074941&quantity%5B0%5D=1&quantity%5B1%5D=1&redirectTo=checkout&skipToCheckout=1&store_token=KUnrhC4TpVRWiAQLILVoXtrsLhzfxyw6ARpQlKzP&tokenReference=8EO7JYYGRF8C"
-            target="_blank"
-            rel="noopener noreferrer"
-          >Comprar agora</a>
+          <a class="btn btn--solid" href="#loja">Comprar agora</a>
         </article>
 
         <article class="bento__cell bento__cell--copy">
@@ -465,12 +597,7 @@
             Aplique no corpo molhado, massageie em movimentos circulares e
             enxágue. Use de 2 a 3 vezes por semana para esfoliar e hidratar.
           </p>
-          <a
-            class="btn btn--solid"
-            href="https://seguro.bewo.com.br/cart/items?bundle_id=308300&clearCart=1&metadata%5Bsource_platform%5D=bundle_link&product_option_id%5B0%5D=304074940&product_option_id%5B1%5D=304074941&quantity%5B0%5D=1&quantity%5B1%5D=1&redirectTo=checkout&skipToCheckout=1&store_token=KUnrhC4TpVRWiAQLILVoXtrsLhzfxyw6ARpQlKzP&tokenReference=8EO7JYYGRF8C"
-            target="_blank"
-            rel="noopener noreferrer"
-          >Quero o esfoliante</a>
+          <a class="btn btn--solid" href="#comprar">Quero o esfoliante</a>
         </article>
 
         <figure class="bento__cell bento__cell--image">
@@ -521,7 +648,40 @@
       </p>
     </footer>
 
-    <div class="toast" data-toast hidden>Espuma adicionada ao carrinho</div>
+    <div class="toast" data-toast hidden>Adicionado ao carrinho</div>
+
+    <div class="cart-drawer" data-cart-drawer hidden>
+      <button
+        type="button"
+        class="cart-drawer__backdrop"
+        data-cart-close
+        aria-label="Fechar carrinho"
+      ></button>
+      <aside
+        class="cart-drawer__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cart-title"
+      >
+        <header class="cart-drawer__head">
+          <h2 id="cart-title">Seu carrinho</h2>
+          <button type="button" class="cart-drawer__x" data-cart-close aria-label="Fechar">
+            ×
+          </button>
+        </header>
+        <div class="cart-drawer__list" data-cart-list></div>
+        <p class="cart-drawer__empty" data-cart-empty>Seu carrinho está vazio.</p>
+        <footer class="cart-drawer__foot">
+          <div class="cart-drawer__total">
+            <span>Total</span>
+            <strong data-cart-total>R$ 0,00</strong>
+          </div>
+          <button type="button" class="btn btn--solid btn--lg" data-cart-checkout disabled>
+            Finalizar compra
+          </button>
+        </footer>
+      </aside>
+    </div>
 
     <div
       class="lightbox"

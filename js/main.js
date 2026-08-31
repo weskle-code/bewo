@@ -50,13 +50,9 @@
     }
   });
 
-  /* ——— UI: cart / carousel ——— */
-  const cartEls = $$("[data-cart-count]");
+  /* ——— Toast ——— */
   const toast = $("[data-toast]");
-  let cartCount = 0;
   let toastTimer;
-
-  const syncCart = () => cartEls.forEach((el) => (el.textContent = String(cartCount)));
 
   const showToast = () => {
     if (!toast) return;
@@ -85,24 +81,6 @@
     }, 2200);
   };
 
-  $$("[data-add-cart]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      cartCount += 1;
-      syncCart();
-      showToast();
-      const original = btn.textContent;
-      btn.textContent = "Adicionado";
-      btn.disabled = true;
-      if (window.gsap) {
-        gsap.fromTo(btn, { scale: 0.96 }, { scale: 1, duration: 0.35, ease: "back.out(2)" });
-      }
-      setTimeout(() => {
-        btn.textContent = original;
-        btn.disabled = false;
-      }, 1400);
-    });
-  });
-
   /* ——— Buy gallery thumbs ——— */
   const initBuyGallery = () => {
     const gallery = $("[data-buy-gallery]");
@@ -126,7 +104,164 @@
 
   initBuyGallery();
 
-  /* ——— Buy quantity → Yampi kit cart with qty ——— */
+  /* ——— Mini-cart + products (Yampi cart/items) ——— */
+  const CATALOG = {
+    kit: {
+      id: "kit",
+      name: "Esfoliante + Necessaire",
+      price: 69.9,
+      image: "./assets/shop/kit.webp",
+      lines: [
+        { optionId: "304074940", ratio: 1 }, // necessaire brinde
+        { optionId: "304074941", ratio: 1 }, // esfoliante
+      ],
+    },
+    espuma: {
+      id: "espuma",
+      name: "Espuma",
+      price: 49.9,
+      image: "./assets/shop/espuma.webp",
+      lines: [{ optionId: "290986638", ratio: 1 }],
+      token: "S5SWOJ4NQ5",
+    },
+    bruma: {
+      id: "bruma",
+      name: "Bruma pós depilatória",
+      price: 79.9,
+      image: "./assets/shop/bruma.webp",
+      lines: [{ optionId: "290986637", ratio: 1 }],
+      token: "F9FTYAOSLY",
+    },
+  };
+
+  const CART_KEY = "bewo-prevenda-cart";
+  const STORE_TOKEN = "KUnrhC4TpVRWiAQLILVoXtrsLhzfxyw6ARpQlKzP";
+
+  const money = (n) =>
+    n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+  const loadCart = () => {
+    try {
+      const raw = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
+      return Array.isArray(raw) ? raw : [];
+    } catch (_) {
+      return [];
+    }
+  };
+
+  let cart = loadCart();
+
+  const saveCart = () => {
+    try {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    } catch (_) {}
+  };
+
+  const cartCount = () => cart.reduce((sum, line) => sum + line.qty, 0);
+  const cartTotal = () =>
+    cart.reduce((sum, line) => {
+      const product = CATALOG[line.id];
+      return sum + (product ? product.price * line.qty : 0);
+    }, 0);
+
+  const buildCheckoutUrl = (lines = cart) => {
+    if (!lines.length) return null;
+    const params = new URLSearchParams({
+      clearCart: "1",
+      redirectTo: "checkout",
+      skipToCheckout: "1",
+      store_token: STORE_TOKEN,
+    });
+    let i = 0;
+    lines.forEach((line) => {
+      const product = CATALOG[line.id];
+      if (!product) return;
+      product.lines.forEach((opt) => {
+        params.set(`product_option_id[${i}]`, opt.optionId);
+        params.set(`quantity[${i}]`, String(line.qty * (opt.ratio || 1)));
+        i += 1;
+      });
+    });
+    return `https://seguro.bewo.com.br/cart/items?${params.toString()}`;
+  };
+
+  const renderCart = () => {
+    const list = $("[data-cart-list]");
+    const empty = $("[data-cart-empty]");
+    const totalEl = $("[data-cart-total]");
+    const checkoutBtn = $("[data-cart-checkout]");
+    const countEls = $$("[data-cart-count]");
+    countEls.forEach((el) => {
+      el.textContent = String(cartCount());
+    });
+    if (totalEl) totalEl.textContent = money(cartTotal());
+    if (checkoutBtn) checkoutBtn.disabled = cart.length === 0;
+
+    if (!list) return;
+    list.innerHTML = "";
+    if (!cart.length) {
+      if (empty) empty.hidden = false;
+      return;
+    }
+    if (empty) empty.hidden = true;
+
+    cart.forEach((line) => {
+      const product = CATALOG[line.id];
+      if (!product) return;
+      const row = document.createElement("article");
+      row.className = "cart-line";
+      row.innerHTML = `
+        <img class="cart-line__img" src="${product.image}" alt="" width="72" height="72" />
+        <div>
+          <p class="cart-line__name">${product.name}</p>
+          <p class="cart-line__price">${money(product.price * line.qty)}</p>
+          <div class="cart-line__row">
+            <div class="cart-line__qty">
+              <button type="button" data-cart-dec="${product.id}" aria-label="Diminuir">−</button>
+              <span>${line.qty}</span>
+              <button type="button" data-cart-inc="${product.id}" aria-label="Aumentar">+</button>
+            </div>
+            <button type="button" class="cart-line__remove" data-cart-remove="${product.id}">Remover</button>
+          </div>
+        </div>`;
+      list.appendChild(row);
+    });
+  };
+
+  const addToCart = (id, qty = 1) => {
+    if (!CATALOG[id]) return;
+    const existing = cart.find((line) => line.id === id);
+    if (existing) existing.qty = Math.min(20, existing.qty + qty);
+    else cart.push({ id, qty: Math.min(20, qty) });
+    saveCart();
+    renderCart();
+    showToast();
+  };
+
+  const setQty = (id, qty) => {
+    const line = cart.find((item) => item.id === id);
+    if (!line) return;
+    if (qty <= 0) cart = cart.filter((item) => item.id !== id);
+    else line.qty = Math.min(20, qty);
+    saveCart();
+    renderCart();
+  };
+
+  const openCart = () => {
+    const drawer = $("[data-cart-drawer]");
+    if (!drawer) return;
+    drawer.hidden = false;
+    document.body.classList.add("is-cart-open");
+  };
+
+  const closeCart = () => {
+    const drawer = $("[data-cart-drawer]");
+    if (!drawer) return;
+    drawer.hidden = true;
+    document.body.classList.remove("is-cart-open");
+  };
+
+  /* kit qty UI (price only) */
   const initBuyQuantity = () => {
     const wrap = $("[data-buy-qty]");
     const input = $("[data-buy-qty-input]");
@@ -136,51 +271,17 @@
     const installmentEl = $("[data-buy-installment]");
     if (!wrap || !input) return;
 
-    const UNIT = 69.9;
-    const MIN = 1;
-    const MAX = 20;
-    const STORE_TOKEN = "KUnrhC4TpVRWiAQLILVoXtrsLhzfxyw6ARpQlKzP";
-    const BUNDLE_ID = "308300";
-    const OPTION_GIFT = "304074940"; // necessaire
-    const OPTION_MAIN = "304074941"; // esfoliante
-    const TOKEN_REF = "8EO7JYYGRF8C";
-
-    const money = (n) =>
-      n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-
-    const clamp = (n) => Math.min(MAX, Math.max(MIN, n | 0 || MIN));
-
-    const checkoutUrl = (qty) => {
-      const q = clamp(qty);
-      const params = new URLSearchParams({
-        bundle_id: BUNDLE_ID,
-        clearCart: "1",
-        "metadata[source_platform]": "bundle_link",
-        "product_option_id[0]": OPTION_GIFT,
-        "product_option_id[1]": OPTION_MAIN,
-        "quantity[0]": String(q),
-        "quantity[1]": String(q),
-        redirectTo: "checkout",
-        skipToCheckout: "1",
-        store_token: STORE_TOKEN,
-        tokenReference: TOKEN_REF,
-      });
-      return `https://seguro.bewo.com.br/cart/items?${params.toString()}`;
-    };
+    const UNIT = CATALOG.kit.price;
+    const clamp = (n) => Math.min(20, Math.max(1, n | 0 || 1));
 
     const sync = () => {
       const qty = clamp(Number(input.value));
       input.value = String(qty);
       const total = UNIT * qty;
-      const parcel = total / 3;
       if (priceEl) priceEl.textContent = money(total);
       if (installmentEl) {
-        installmentEl.textContent = `3x de ${money(parcel)} sem juros`;
+        installmentEl.textContent = `3x de ${money(total / 3)} sem juros`;
       }
-      const href = checkoutUrl(qty);
-      $$('a[href*="seguro.bewo.com.br"]').forEach((a) => {
-        a.href = href;
-      });
     };
 
     minus?.addEventListener("click", () => {
@@ -197,6 +298,91 @@
   };
 
   initBuyQuantity();
+
+  /* shop product qty selectors */
+  const clampQty = (n) => Math.min(20, Math.max(1, n | 0 || 1));
+
+  $$("[data-shop-qty]").forEach((wrap) => {
+    const input = $("[data-shop-qty-input]", wrap);
+    const minus = $("[data-shop-qty-minus]", wrap);
+    const plus = $("[data-shop-qty-plus]", wrap);
+    if (!input) return;
+
+    const sync = () => {
+      input.value = String(clampQty(Number(input.value)));
+    };
+
+    minus?.addEventListener("click", () => {
+      input.value = String(clampQty(Number(input.value) - 1));
+    });
+    plus?.addEventListener("click", () => {
+      input.value = String(clampQty(Number(input.value) + 1));
+    });
+    input.addEventListener("change", sync);
+    input.addEventListener("input", sync);
+  });
+
+  renderCart();
+
+  $$("[data-add-product]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-add-product");
+      let qty = 1;
+      if (id === "kit") {
+        qty = clampQty(Number($("[data-buy-qty-input]")?.value) || 1);
+      } else {
+        const card = btn.closest("[data-product-card]");
+        qty = clampQty(Number($("[data-shop-qty-input]", card || document)?.value) || 1);
+      }
+      addToCart(id, qty);
+      openCart();
+    });
+  });
+
+  $$("[data-buy-now]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-buy-now");
+      if (!CATALOG[id]) return;
+      let qty = 1;
+      if (id === "kit") {
+        qty = Math.min(20, Math.max(1, Number($("[data-buy-qty-input]")?.value) || 1));
+      }
+      const url = buildCheckoutUrl([{ id, qty }]);
+      if (url) window.open(url, "_blank", "noopener,noreferrer");
+    });
+  });
+
+  $("[data-cart-open]")?.addEventListener("click", openCart);
+  $$("[data-cart-close]").forEach((el) => el.addEventListener("click", closeCart));
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && document.body.classList.contains("is-cart-open")) {
+      closeCart();
+    }
+  });
+
+  $("[data-cart-list]")?.addEventListener("click", (e) => {
+    const t = e.target;
+    if (!(t instanceof HTMLElement)) return;
+    const idInc = t.getAttribute("data-cart-inc");
+    const idDec = t.getAttribute("data-cart-dec");
+    const idRm = t.getAttribute("data-cart-remove");
+    if (idInc) {
+      const line = cart.find((item) => item.id === idInc);
+      if (line) setQty(idInc, line.qty + 1);
+    } else if (idDec) {
+      const line = cart.find((item) => item.id === idDec);
+      if (line) setQty(idDec, line.qty - 1);
+    } else if (idRm) {
+      setQty(idRm, 0);
+    }
+  });
+
+  $("[data-cart-checkout]")?.addEventListener("click", () => {
+    const url = buildCheckoutUrl();
+    if (!url) return;
+    window.open(url, "_blank", "noopener,noreferrer");
+  });
 
   const initInfiniteCarousel = () => {
     const track = $("[data-carousel-track]");
